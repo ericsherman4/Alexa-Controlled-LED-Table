@@ -2,6 +2,7 @@ Method one:
 https://github.com/makeratplay/AlexaVoiceControl
 https://www.youtube.com/watch?v=11NMUUlDJmw
 https://www.youtube.com/watch?v=7T4hS5EFB_I
+https://www.youtube.com/watch?v=_AaS32MWL8E&t=0s
 
 Method two:
 https://github.com/Aircoookie/Espalexa
