@@ -2,7 +2,7 @@
 
 FAUXMO ESP
 
-Copyright (C) 2016-2020 by Xose Pérez <xose dot perez at gmail dot com>
+Copyright (C) 2016-2020 by Xose Pérez <xose dot perez at gmail dot com>, 2020-2021 by Paul Vint <paul@vintlabs.com>
 
 The MIT License (MIT)
 
@@ -72,13 +72,18 @@ THE SOFTWARE.
 #include <MD5Builder.h>
 #include "templates.h"
 
-typedef std::function<void(unsigned char, const char *, bool, unsigned char)> TSetStateCallback;
+typedef std::function<void(unsigned char, const char *, bool, unsigned char, unsigned int, unsigned int, unsigned int)> TSetStateCallback;
 
 typedef struct {
     char * name;
     bool state;
     unsigned char value;
-    char uniqueid[28];
+	unsigned int hue;
+    unsigned int saturation;
+    unsigned int ct;
+    char colormode[3];  // This might have to change to an enum 
+    unsigned char red, green, blue;
+	char uniqueid[28];
 } fauxmoesp_device_t;
 
 class fauxmoESP {
@@ -98,6 +103,17 @@ class fauxmoESP {
         void onSetState(TSetStateCallback fn) { _setCallback = fn; }
         bool setState(unsigned char id, bool state, unsigned char value);
         bool setState(const char * device_name, bool state, unsigned char value);
+		
+		bool setState(unsigned char id, bool state, unsigned int hue, unsigned int saturation);
+        bool setState(const char * device_name, bool state, unsigned int hue, unsigned int saturation);
+        bool setState(unsigned char id, bool state, unsigned int ct);
+        bool setState(const char * device_name, bool state, unsigned int ct);
+
+        uint8_t getRed(unsigned char id);
+        uint8_t getGreen(unsigned char id);
+        uint8_t getBlue(unsigned char id);
+        char * getColormode(unsigned char id, char * buffer, size_t len);
+		
         bool process(AsyncClient *client, bool isGet, String url, String body);
         void enable(bool enable);
         void createServer(bool internal) { _internal = internal; }
@@ -119,6 +135,10 @@ class fauxmoESP {
         TSetStateCallback _setCallback = NULL;
 
         String _deviceJson(unsigned char id, bool all); 	// all = true means we are listing all devices so use full description template
+		
+		void _setRGBFromHSV(unsigned char id);
+        void _adjustRGBFromValue(unsigned char id);
+        void _setRGBFromCT(unsigned char id);
 
         void _handleUDP();
         void _onUDPData(const IPAddress remoteIP, unsigned int remotePort, void *data, size_t len);

@@ -93,14 +93,15 @@ void setup() {
     // "Alexa, turn on yellow lamp
     // "Alexa, set yellow lamp to fifty" (50 means 50% of brightness, note, this example does not use this functionality)
 
-    // Add virtual devices
+    // Add virtual devices - Note that many users have problems on ESP8266 with more than three devices
     fauxmo.addDevice(ID_YELLOW);
     fauxmo.addDevice(ID_GREEN);
     fauxmo.addDevice(ID_BLUE);
-    fauxmo.addDevice(ID_PINK);
-    fauxmo.addDevice(ID_WHITE);
+    //fauxmo.addDevice(ID_PINK);
+    //fauxmo.addDevice(ID_WHITE);    
+    
 
-    fauxmo.onSetState([](unsigned char device_id, const char * device_name, bool state, unsigned char value) {
+    fauxmo.onSetState([](unsigned char device_id, const char * device_name, bool state, unsigned char value, unsigned int hue, unsigned int saturation, unsigned int ct) {
         
         // Callback when a command from Alexa is received. 
         // You can use device_id or device_name to choose the element to perform an action onto (relay, LED,...)
@@ -108,26 +109,21 @@ void setup() {
         // Just remember not to delay too much here, this is a callback, exit as soon as possible.
         // If you have to do something more involved here set a flag and process it in your main loop.
         
-        Serial.printf("[MAIN] Device #%d (%s) state: %s value: %d\n", device_id, device_name, state ? "ON" : "OFF", value);
+        Serial.printf("[MAIN] Device #%d (%s) state: %s value: %d hue: %d saturation: %u ct: %u\n", device_id, device_name, state ? "ON" : "OFF", value, hue, saturation, ct);
 
         // Checking for device_id is simpler if you are certain about the order they are loaded and it does not change.
         // Otherwise comparing the device_name is safer.
 
         if (strcmp(device_name, ID_YELLOW)==0) {
             digitalWrite(LED_YELLOW, state ? HIGH : LOW);
-            Serial.println("Set device to yellow");
         } else if (strcmp(device_name, ID_GREEN)==0) {
             digitalWrite(LED_GREEN, state ? HIGH : LOW);
-            Serial.println("Set device to green");
         } else if (strcmp(device_name, ID_BLUE)==0) {
             digitalWrite(LED_BLUE, state ? HIGH : LOW);
-            Serial.println("Set device to blue");
         } else if (strcmp(device_name, ID_PINK)==0) {
             digitalWrite(LED_PINK, state ? HIGH : LOW);
-            Serial.println("Set device to pink");
         } else if (strcmp(device_name, ID_WHITE)==0) {
             digitalWrite(LED_WHITE, state ? HIGH : LOW);
-            Serial.println("Set device to white");
         }
 
     });
@@ -148,10 +144,7 @@ void loop() {
         Serial.printf("[MAIN] Free heap: %d bytes\n", ESP.getFreeHeap());
     }
 
-
-    // CAN DO WHATS BELOW OR YOU CAN DISABLE FAUXMO BY PASSING FALSE TO ENABLE. THIS WILL PREVENT ALEXA FROM CONTROLLING IT. MAYBE YOU CAN TIE A SWITCH TO THAT? NOT SURE WHATS BEST.
-
-    // If your device state is changed by any other means (MQTT, physical button,...) 
+    // If your device state is changed by any other means (MQTT, physical button,...)
     // you can instruct the library to report the new state to Alexa on next request:
     // fauxmo.setState(ID_YELLOW, true, 255);
 

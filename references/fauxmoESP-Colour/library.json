@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/vintlabs/fauxmoESP"
     },
-    "version": "3.4",
+    "version": "3.2",
     "license": "MIT",
     "exclude": "tests",
     "frameworks": "arduino",
@@ -29,5 +29,7 @@
             "platforms": "espressif32"
         }
     ],
-    "headers": "fauxmoESP.h"
+    "examples": [
+        "examples/*/*.ino"
+    ]
 }
