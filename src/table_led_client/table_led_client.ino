@@ -67,7 +67,7 @@ U8G2_SSD1306_128X64_NONAME_2_SW_I2C u8g2(U8G2_R0, PIN_A5, PIN_A4 , 4);
 
 void setup() {
 //    delay(1000); // 3 second delay for recovery
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     u8g2.begin();  
 
@@ -98,16 +98,33 @@ void setup() {
 /////////////////////////////
 
 
+String thing = "";
 
 void loop()
 {
+
   // send data only when you receive data:
-  if (Serial.available() > 0) {
+  while (Serial.available() > 0) {
     // read the incoming byte:
 
-    Serial.println(Serial.readString()); //this is actually sending it to the esp as well. so you can fully debug from esp side!
-    //the arduino serial monitor port is tied with the uart.
+    thing += Serial.readString();
+
   }
+//  Serial.println(String(thing.length()));
+//  for(int i =0; i < thing.length(); i++)
+//  {
+////    Serial.print(thing[i]);
+//    if(thing[i] == char(13) ||  thing[i] == char(10) || thing[i] == char(0))
+//    {
+//      thing[i] = '_';
+//    }
+//  }
+  
+  if(!thing.equals("")){
+    Serial.println(thing);
+  }
+  thing="";
+  delay(500);
 
 
 
@@ -187,29 +204,24 @@ void loop()
 //    Serial.println("exec2");
   }
 
-//   switch(state){
-//     case 0:
-//       gCurrentPatternNumber = 0;
-//       break;
-//     case 1:
-//       gCurrentPatternNumber = 4;
-//       break;
-//      case 2: 
-//       gCurrentPatternNumber = 5;
-//       break;
-//      case 3:
-//       gCurrentPatternNumber = 6;
-//       break;
-//      case 4:
-//       gCurrentPatternNumber = 7;
-//       break;
-//      case 5:
-//       gCurrentPatternNumber = 8;
-//       break;
-     
-//   }
   
 }
+
+/////////////////////////////
+//// COMMS //////////////////
+/////////////////////////////
+
+void debug_ascii(String thing)
+{
+    for(int w=0; w < thing.length(); w++)  
+    {
+        Serial.print(thing.charAt(w),DEC);
+        Serial.print(" ");
+    }
+    Serial.println("");
+
+}
+
 
 
 

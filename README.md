@@ -33,6 +33,10 @@ Their code is included in this repo for personal reference but all credit and re
 ## ESP32 Documentation
 Pinout: https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
+References for the UART:
+    https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/HardwareSerial.h
+    https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/HardwareSerial.cpp
+
 ## Integration Plan
 Set up one virtual device for doing all the standard colors on the table. This probably means that we could probably get rid of some of the modes like white or warm right. 
 Should test it out to see if it's a good color or not. 
@@ -40,10 +44,14 @@ Should test it out to see if it's a good color or not.
 Set up the rest of the virtual devices should just be used as on/off. Make it so setting different colors or brightness has no impact. These will be tied directly to the animations.
 
 ESP32 <> Arduino will be UART (granted the noise isn't too bad.) Send data to Arduino. 
-however UART is very blocking and breaks the animations pretty bad. 
+however UART is very blocking and breaks the animations pretty bad.  same with the OLED display
 Could do like whenever I get a request, stop the animation and handle the request and switch the animation / color immediately. At this point also update the display.
 
 Turning off/on Alexa controlled mode and letting arduino be controlled directly: 
 One toggle switch sends a note to both? I think that's the best most sure fire way. Be careful because the ESP32 pins ARE NOT 5V tolerant. 
 I think that the Arduino would definitely recognize 3.3V as a one though.
 In the Arduino code, using the bool from that switch, determine whether to handle I2C calls or just handle the toggle switches. 
+
+## Troubleshooting
+1. Arduino likes to send a bunch of random and garbage characters to the ESP. Things like carriage returns and line feeds and null characters. These need to be accounted for.
+2. Need to unplug ESP32 and normally power cycle the arduino when uploading code. This is probably because the UART is on the same serial port as the USB so the comms probably interfere.

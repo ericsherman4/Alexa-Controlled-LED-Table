@@ -1,0 +1,28 @@
+[MAIN:4] Device #0 (Strip) state: ON value: 254 hue: 54613 saturation: 254 ct: 500
+Colormode: hs
+HSV: 54613 254 254  RGB: 252 0 253
+Message received:67
+
+input:rgb
+left: r right:r
+left: g right:g
+left: b right:b
+input:1
+left: 1 right:1
+input:254
+left: 2 right:2
+left: 5 right:5
+left: 4 right:4
+input:252
+left: 2 right:2
+left: 5 right:5
+left: 2 right:2
+input:0
+left: 0 right:0
+input:253
+left: 2 right:2
+left: 5 right:5
+left: 3 right:3
+here: rgb_1_254_252_0_253
+Sending rgb command
+Message received:67
