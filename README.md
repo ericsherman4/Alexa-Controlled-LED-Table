@@ -1,6 +1,10 @@
 # Alexa-Controlled-LED-Table
 This is for enabling my led table to be controlled by alexa. Goal is for it to be able to set certain animations based on voice commands to my alexa.
 
+//TODO: ELAB MORE ON PROTOCOLS USED AND SETUP
+
+Tested and works on Echo Dot GEN4
+
 ## Hardware
 ESP32 from Amazon [https://www.amazon.com/gp/product/B09J94HPZB/]
 - The board name in the Arduino IDE is ESP32 Wrover Module
@@ -10,6 +14,9 @@ ESP32 from Amazon [https://www.amazon.com/gp/product/B09J94HPZB/]
 Arduino Uno R3, using Fast LED library for the LED strip animations [https://www.amazon.com/ELEGOO-Board-ATmega328P-ATMEGA16U2-Compliant/dp/B01EWOE0UU/]
 
 LED strip, w/ WS2812B controller: https://www.amazon.com/gp/product/B01LSF4Q0A/
+
+![Schematics](schematics.jpg?raw=true "Schematics")
+Can download high quality version directly from repo.
 
 ## Alexa <> ESP Comms
 Credit to https://github.com/vintlabs/fauxmoESP for their examples and ESP <> Alexa interface. 
@@ -35,7 +42,13 @@ Pinout: https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
 References for the UART:
     https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/HardwareSerial.h
+
     https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/HardwareSerial.cpp
+
+## u8g2 Lib for OLED Documenation
+https://github.com/olikraus/u8g2/blob/master/sys/arduino/u8g2_page_buffer/HelloWorld/HelloWorld.ino
+
+https://github.com/olikraus/u8g2/wiki/u8g2reference
 
 ## Integration Plan
 Set up one virtual device for doing all the standard colors on the table. This probably means that we could probably get rid of some of the modes like white or warm right. 

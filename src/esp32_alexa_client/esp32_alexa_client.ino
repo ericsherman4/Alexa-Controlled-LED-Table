@@ -33,7 +33,11 @@
 
 //Other
 #define WIFI_LOOP_DELAY 500
-#define TIMEOUT 80
+#ifdef TEST_BROKEN_WIFI
+  #define TIMEOUT 20
+#else
+  #define TIMEOUT 80
+#endif
 
 //Pins
 #define WIFI_EN_PIN 4
@@ -124,20 +128,23 @@ void setup()
 
     // Wifi
     wifiSetup();
-
+    
+    String response_str;
+    bool sent = false;
     while(gtimeoutflag == true)
     {
-        String response_str;
+        
         write_buffer(BROKEN_WIFI);
         // Notify arduino of absence of wifi
-        if(Serial2.availableForWrite()){
+        if(Serial2.availableForWrite() && !sent){
             Serial.println("Sending BROKEN_WIFI command");
             //length is in bytes, so number of indexes of the char array
             Serial2.write(buf, strlen(BROKEN_WIFI));
+            sent = true;
         }
 
         // Confirm response
-        if(Serial2.available()){
+        if(Serial2.available() && sent){
             response_str = Serial2.readString();
             Serial.println("Message received:" + response_str);
             if(response_str.equals(BROKEN_WIFI))
@@ -305,16 +312,21 @@ bool send_anim_command(String command)
 // the values of all the variables to send will be placed in global variables by the handler.
 bool send_strip_command(String command)
 {
-    //command (device id encoded), state, value, rval, gval, bval
+    //command (device id encoded), state, value, (rval, gval, and bval concatenated)
     unsigned int buffer_pos = 0;
     buffer_pos = write_buffer_idx(command, buffer_pos);
     buffer_pos= write_buffer_idx(gstate ? "1" : "0", buffer_pos);
     if(gstate)
     {
-        buffer_pos= write_buffer_idx(String(gvalue), buffer_pos);
-        buffer_pos= write_buffer_idx(String(fauxmo.getRed(gdevice_id)), buffer_pos);
-        buffer_pos= write_buffer_idx(String(fauxmo.getGreen(gdevice_id)), buffer_pos);
-        buffer_pos= write_buffer_idx(String(fauxmo.getBlue(gdevice_id)), buffer_pos);
+        buffer_pos = write_buffer_idx(String(gvalue), buffer_pos);
+//        int tempper = (fauxmo.getRed(gdevice_id) << 16) | (fauxmo.getGreen(gdevice_id) << 8) | (fauxmo.getBlue(gdevice_id));
+//        Serial.print("debug too");
+//        Serial.println(tempper);
+//        Serial.println("debug:" +  String(int(fauxmo.getRed(gdevice_id) << 16) | int(fauxmo.getGreen(gdevice_id) << 8) | int(fauxmo.getBlue(gdevice_id))));
+        buffer_pos = write_buffer_idx(String(int(fauxmo.getRed(gdevice_id) << 16) | int(fauxmo.getGreen(gdevice_id) << 8) | int(fauxmo.getBlue(gdevice_id))), buffer_pos); 
+        // buffer_pos= write_buffer_idx(String(fauxmo.getRed(gdevice_id)), buffer_pos);
+        // buffer_pos= write_buffer_idx(String(fauxmo.getGreen(gdevice_id)), buffer_pos);
+        // buffer_pos= write_buffer_idx(String(fauxmo.getBlue(gdevice_id)), buffer_pos);
     }
 
     return uart_send(command, buffer_pos-1);
