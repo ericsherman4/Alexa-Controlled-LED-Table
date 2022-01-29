@@ -16,8 +16,8 @@
 #define DEVICE_NAME_4 "BPM"
 
 //Serial
-#define SERIAL_BAUDRATE_MONITOR 115200
-#define SERIAL_BAUDRATE_UART 115200   
+#define SERIAL_BAUDRATE_MONITOR 38400
+#define SERIAL_BAUDRATE_UART 38400   
 #define RXD2 16
 #define TXD2 17
 
@@ -266,16 +266,29 @@ void loop() {
             // Confirm response
             if(Serial2.available()){
                 response_str1 = Serial2.readString();
-                if(response_str1.indexOf(char(13)) < response_str1.length())
+                Serial.println("here22: " + response_str1);
+
+                Serial.print("before: ");
+                for(int i =0 ; i < response_str1.length(); i++)
+                {
+                  Serial.print(response_str1[i], DEC);
+                  Serial.print(" ");
+                }
+                Serial.println("");
+
+
+                
+                if(response_str1.indexOf(char(13)) < response_str1.length()  && response_str1.indexOf(char(13)) != -1 )
                 {
                   response_str1 = response_str1.substring(0,response_str1.indexOf(char(13)));
                 }
+                Serial.print("after: ");
                 for(int w=0; w < response_str1.length(); w++)
-                
                 {
                   Serial.print(response_str1.charAt(w),DEC);
                   Serial.print(" ");
                 }
+                Serial.println("");
                 Serial.println("Message received:" + response_str1);
                 if(response_str1.equals(ACK))
                 {
@@ -319,14 +332,7 @@ bool send_strip_command(String command)
     if(gstate)
     {
         buffer_pos = write_buffer_idx(String(gvalue), buffer_pos);
-//        int tempper = (fauxmo.getRed(gdevice_id) << 16) | (fauxmo.getGreen(gdevice_id) << 8) | (fauxmo.getBlue(gdevice_id));
-//        Serial.print("debug too");
-//        Serial.println(tempper);
-//        Serial.println("debug:" +  String(int(fauxmo.getRed(gdevice_id) << 16) | int(fauxmo.getGreen(gdevice_id) << 8) | int(fauxmo.getBlue(gdevice_id))));
         buffer_pos = write_buffer_idx(String(int(fauxmo.getRed(gdevice_id) << 16) | int(fauxmo.getGreen(gdevice_id) << 8) | int(fauxmo.getBlue(gdevice_id))), buffer_pos); 
-        // buffer_pos= write_buffer_idx(String(fauxmo.getRed(gdevice_id)), buffer_pos);
-        // buffer_pos= write_buffer_idx(String(fauxmo.getGreen(gdevice_id)), buffer_pos);
-        // buffer_pos= write_buffer_idx(String(fauxmo.getBlue(gdevice_id)), buffer_pos);
     }
 
     return uart_send(command, buffer_pos-1);
@@ -334,12 +340,21 @@ bool send_strip_command(String command)
 
 bool uart_send(String command, unsigned int len)
 {
-    Serial.print("here: ");
+    Serial.print("len: " + String(len) + ", here: ");
     for(int i =0 ; i < len; i++)
     {
       Serial.print(buf[i]);
     }
     Serial.println("");
+    buf[len++] ='\n';
+    
+    Serial.print("len: " + String(len) + ", here: ");
+    for(int i =0 ; i < len; i++)
+    {
+      Serial.print(buf[i]);
+    }
+    Serial.println("");
+    
     if(Serial2.availableForWrite()){
         Serial.println("Sending " + command + " command");
         //length is in bytes, so number of indexes of the char array

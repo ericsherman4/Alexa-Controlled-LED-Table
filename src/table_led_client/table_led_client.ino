@@ -90,6 +90,7 @@ Brightness value
 #define MAX_NUM_SEGMENTS 4
 #define MAX_SEGMENT_SIZE 5 //include one extra for null terminator
 
+
 String g_str = "";
 
 //////////////////////////////
@@ -113,7 +114,7 @@ char buff[NUM_DISPLAY_LINES][NUM_CHARS_PER_LINE];
 void setup() {
     
     delay(500);
-    Serial.begin(115200); 
+    Serial.begin(38400); 
 
     // tell FastLED about the LED strip configuration
     FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
@@ -159,11 +160,13 @@ void loop()
 
         if(g_str != "")
         {
+            
             String test = g_str.substring(0,3);
-
+            Serial.println(test + " thing " + g_str);
+            
             if(test.equals(SET_STRIP_RGB))
             {
-                Serial.print(ACK);
+//                Serial.print(ACK);
                 if(g_str[strlen(SET_STRIP_RGB) + 1] == '1')
                 {
                     int i=0, count=0;
@@ -190,7 +193,7 @@ void loop()
             }
             else if(test.equals(SET_ANIM_BPM))
             {
-                Serial.print(ACK);
+//                Serial.print(ACK);
                 if(g_str[g_str.length()-1] == '1')
                 {
                     write_buffer(1, SET_ANIM_BPM, true);
@@ -208,7 +211,7 @@ void loop()
             }
             else if(test.equals(SET_ANIM_JUGGLE))
             {
-                Serial.print(ACK);
+//                Serial.print(ACK);
                 if(g_str[g_str.length()-1] == '1')
                 {
                     write_buffer(1, SET_ANIM_JUGGLE, true);
@@ -225,7 +228,7 @@ void loop()
             }
             else if(test.equals(SET_ANIM_RAINBOW))
             {
-                Serial.print(ACK);
+//                Serial.print(ACK);
                 if(g_str[g_str.length()-1] == '1')
                 {
                     write_buffer(1, SET_ANIM_RAINBOW, true);
@@ -251,7 +254,7 @@ void loop()
             {
                 //TODO WRITE A THING TO HANDLE ON ESP
                 //and do a define for below too
-                Serial.print("NZ");
+                Serial.println("NZ");
             }
 
             //Update display with message
@@ -354,6 +357,7 @@ void loop()
     }
 #endif
 
+//TODO CONSIDER SWITCHING TO THIS STRUCTURE SO ITS NOT BLOCKING https://forum.arduino.cc/t/serial-input-basics-updated/382007
 void get_message()
 {
     if(Serial.available() <= 0 )
@@ -363,10 +367,42 @@ void get_message()
     }
     else
     {
-        while (Serial.available() > 0) {
-            // read the incoming buffer:
-            g_str += Serial.readString();
+        //grab the last thing out of the buffer.
+        //incoming string must be terminated with a new line char
+        bool notdone = true;
+        int idx = 0;
+        g_str="                       ";
+        int timeout = 5000;
+        unsigned long start = millis();
+        while(notdone) {
+            if(Serial.available() > 0)
+            {
+              g_str[idx] = Serial.read();
+              
+              if(g_str[idx++] == '\n')
+              {
+                notdone = false;            
+              }
+            }
+            
+            if((millis()-start) > timeout)
+            {
+              break;
+            }
         }
+        if(g_str.indexOf(char(32)) < g_str.length()  && g_str.indexOf(char(32)) != -1 )
+        {
+          g_str = g_str.substring(0,g_str.indexOf(char(32)));
+        }
+        
+        Serial.println("");
+        
+        for(int w=0; w < g_str.length(); w++)  
+        {
+            Serial.print(g_str.charAt(w),DEC);
+            Serial.print(" ");
+        }
+        Serial.println("");
     }
 
     

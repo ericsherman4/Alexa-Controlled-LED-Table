@@ -10,3 +10,12 @@
 
 [ ]
 [ ]
+
+
+so yea, i think this is a good article that needs to be explored. https://forum.arduino.cc/t/serial-input-basics-updated/382007
+for one, need to get rid of strings on the arduino side cause it can fragment the memory and i already have low space left.
+
+i would recommend just doing a serial read for x amount of seconds and seeing if all the data comes in or not.
+it returns -1 if the buffer is empty and you do a read.
+so you should get the message but with a bunch of -1 in the middle.
+if you are fully getting the message then, there isnt a problem during transit. 
